@@ -12,7 +12,7 @@ func TestBaseEventMarshal(t *testing.T) {
 			Event:     "run_start",
 			Timestamp: time.Date(2026, 5, 6, 14, 0, 0, 0, time.UTC),
 			RunID:     "TEST001",
-			Cluster:   "pittsburg",
+			Cluster:   "cluster-a",
 			Version:   "0.1.0",
 		},
 		Scenario: "http-small-5k-qps",
@@ -35,8 +35,8 @@ func TestBaseEventMarshal(t *testing.T) {
 	if decoded["run_id"] != "TEST001" {
 		t.Errorf("expected run_id 'TEST001', got %v", decoded["run_id"])
 	}
-	if decoded["cluster"] != "pittsburg" {
-		t.Errorf("expected cluster 'pittsburg', got %v", decoded["cluster"])
+	if decoded["cluster"] != "cluster-a" {
+		t.Errorf("expected cluster 'cluster-a', got %v", decoded["cluster"])
 	}
 	if decoded["scenario"] != "http-small-5k-qps" {
 		t.Errorf("expected scenario name, got %v", decoded["scenario"])

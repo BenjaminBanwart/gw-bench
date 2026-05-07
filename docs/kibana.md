@@ -8,7 +8,7 @@ Create an index pattern matching your log pipeline's index for gw-bench events (
 
 ### All events for a specific run
 ```
-run_id: "01JX3K7M0000PITTSBURG00001"
+run_id: "01JX3K7M0000CLUSTERA00001"
 ```
 
 ### Comparison events only

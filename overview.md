@@ -151,7 +151,7 @@ gw-bench/
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  cluster: pittsburg (or columbia, or lab)                       │
+│  cluster: cluster-a (or cluster-b, or lab)                      │
 │                                                                 │
 │   namespace: gw-bench                                           │
 │                                                                 │
@@ -318,8 +318,8 @@ type BaseEvent struct {
 {
   "event": "run_start",
   "timestamp": "2026-05-06T14:00:00Z",
-  "run_id": "01JX3K7M0000PITTSBURG00001",
-  "cluster": "pittsburg",
+  "run_id": "01JX3K7M0000CLUSTERA00001",
+  "cluster": "cluster-a",
   "scenario": "http-small-5k-qps",
   "gateways": ["agentgateway", "ingress-nginx"],
   "gw_bench_version": "0.1.0"
@@ -553,7 +553,7 @@ Each phase is a complete, mergeable, demoable unit. The agent should not begin a
 
 - Full chart at `deploy/helm/gw-bench/` per §5.5.
 - `helm-lint.yaml` workflow runs `helm lint` and `helm template` against `values.example.yaml`.
-- `deploy/argocd/applicationset.yaml` example for two clusters (Pittsburg, Columbia) with cluster-specific overrides.
+- `deploy/argocd/applicationset.yaml` example for two clusters (cluster-a, cluster-b) with cluster-specific overrides.
 - `docs/deployment.md` covering ArgoCD wiring.
 
 **Acceptance:** `helm install` against a kind cluster (with ingress-nginx and a stub agentgateway) deploys cleanly. `kubectl create job --from=...` runs the canonical scenario end-to-end and produces valid NDJSON in the Job logs.
@@ -641,7 +641,7 @@ Each phase is a complete, mergeable, demoable unit. The agent should not begin a
 ## 9. Operational notes
 
 ### First deployment
-- Lab cluster only. Don't run this in Pittsburg or Columbia until a full pass on lab is clean.
+- Lab cluster only. Don't run this in production clusters until a full pass on lab is clean.
 - Two replicas of the test backend with hostname anti-affinity.
 - Schedule the runner Job on a node *different* from the gateway pods to avoid measuring noisy-neighbor effects from the load generator on the gateway itself.
 
