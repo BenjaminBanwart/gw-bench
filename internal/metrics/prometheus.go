@@ -86,7 +86,7 @@ func (c *PrometheusClient) queryRangeAggregates(ctx context.Context, query strin
 	if err != nil {
 		return 0, 0, 0, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	var result promQueryResult
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {

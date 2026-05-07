@@ -25,7 +25,7 @@ func LoadFromFile(path string, runID string) (*Report, error) {
 	if err != nil {
 		return nil, fmt.Errorf("opening file: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	return LoadFromReader(f, runID)
 }
 

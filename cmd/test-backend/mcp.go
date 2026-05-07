@@ -98,7 +98,7 @@ func handleMCP(w http.ResponseWriter, r *http.Request) {
 func handleInitialize(w http.ResponseWriter, req jsonRPCRequest) {
 	// Generate session ID
 	b := make([]byte, 16)
-	rand.Read(b)
+	_, _ = rand.Read(b)
 	sessionID := fmt.Sprintf("%x", b)
 
 	sessionsMu.Lock()
@@ -206,7 +206,7 @@ func handleToolsCall(w http.ResponseWriter, req jsonRPCRequest) {
 
 func writeJSONRPCResult(w http.ResponseWriter, id json.RawMessage, result any) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(jsonRPCResponse{
+	_ = json.NewEncoder(w).Encode(jsonRPCResponse{
 		JSONRPC: "2.0",
 		ID:      id,
 		Result:  result,
@@ -215,7 +215,7 @@ func writeJSONRPCResult(w http.ResponseWriter, id json.RawMessage, result any) {
 
 func writeJSONRPCError(w http.ResponseWriter, id json.RawMessage, code int, message string) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(jsonRPCResponse{
+	_ = json.NewEncoder(w).Encode(jsonRPCResponse{
 		JSONRPC: "2.0",
 		ID:      id,
 		Error:   &jsonRPCError{Code: code, Message: message},

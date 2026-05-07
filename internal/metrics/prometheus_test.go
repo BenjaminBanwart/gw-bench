@@ -51,7 +51,7 @@ func TestQueryGatewayResources_Success(t *testing.T) {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(result)
+		_ = json.NewEncoder(w).Encode(result)
 	}))
 	defer server.Close()
 
@@ -111,7 +111,7 @@ func TestQueryGatewayResources_EmptyResult(t *testing.T) {
 		result := promQueryResult{Status: "success"}
 		result.Data.ResultType = "matrix"
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(result)
+		_ = json.NewEncoder(w).Encode(result)
 	}))
 	defer server.Close()
 
