@@ -84,7 +84,7 @@ func TestQueryGatewayResources_Success(t *testing.T) {
 func TestQueryGatewayResources_PrometheusError(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(promQueryResult{
+		_ = json.NewEncoder(w).Encode(promQueryResult{
 			Status: "error",
 			Error:  "bad query",
 		})
