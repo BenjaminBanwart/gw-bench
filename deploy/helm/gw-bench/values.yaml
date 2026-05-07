@@ -1,0 +1,48 @@
+backend:
+  enabled: true
+  image:
+    repository: ghcr.io/benjaminbanwart/gw-bench-backend
+    tag: ""
+    pullPolicy: IfNotPresent
+  replicas: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+  affinity: {}
+  port: 8080
+
+runner:
+  image:
+    repository: ghcr.io/benjaminbanwart/gw-bench
+    tag: ""
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: "1"
+      memory: 1Gi
+    limits:
+      cpu: "4"
+      memory: 4Gi
+  cronjob:
+    enabled: false
+    schedule: "0 2 * * 0"
+  defaultScenario: http-small-5k-qps
+  prometheus:
+    url: ""
+  clusterName: ""
+
+gateways: {}
+
+scenarios:
+  bundled: true
+  custom: {}
+
+networkPolicy:
+  enabled: false
+
+serviceMonitor:
+  enabled: false

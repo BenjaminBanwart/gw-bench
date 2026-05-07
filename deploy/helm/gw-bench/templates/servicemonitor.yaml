@@ -1,0 +1,16 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Release.Name }}-backend
+  namespace: {{ include "gw-bench.namespace" . }}
+  labels:
+    {{- include "gw-bench.backendLabels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "gw-bench.backendSelectorLabels" . | nindent 6 }}
+  endpoints:
+    - port: http
+      interval: 15s
+{{- end }}

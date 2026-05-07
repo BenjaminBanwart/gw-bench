@@ -1,0 +1,28 @@
+apiVersion: gw-bench/v1
+kind: Scenario
+metadata:
+  name: http-small-5k-qps
+  description: |
+    Small JSON payload at sustained 5k QPS over 100 connections.
+    Tests connection-reuse efficiency at moderate load.
+spec:
+  protocol: http
+  loadGenerator: fortio
+  duration: 60s
+  warmup: 10s
+  cooldown: 30s
+  targetQPS: 5000
+  connections: 100
+  payload:
+    method: GET
+    path: /echo
+    sizeBytes: 0
+    headers:
+      X-Test-Run: gw-bench
+  gateways:
+    - name: agentgateway
+      url: http://test.agentgateway.internal/echo
+      promPodSelector: 'app.kubernetes.io/name="agentgateway"'
+    - name: ingress-nginx
+      url: http://test.nginx.internal/echo
+      promPodSelector: 'app.kubernetes.io/name="ingress-nginx"'

@@ -1,0 +1,53 @@
+backend:
+  enabled: true
+  image:
+    repository: ghcr.io/benjaminbanwart/gw-bench-backend
+    tag: "0.1.0"
+  replicas: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+
+runner:
+  image:
+    repository: ghcr.io/benjaminbanwart/gw-bench
+    tag: "0.1.0"
+  resources:
+    requests:
+      cpu: "1"
+      memory: 1Gi
+    limits:
+      cpu: "4"
+      memory: 4Gi
+  cronjob:
+    enabled: false
+    schedule: "0 2 * * 0"
+  defaultScenario: http-small-5k-qps
+  prometheus:
+    url: http://prometheus-operated.monitoring.svc:9090
+  clusterName: lab
+
+gateways:
+  agentgateway:
+    enabled: true
+    type: gatewayApi
+    parentRef:
+      name: agentgateway
+      namespace: agentgateway-system
+    hostname: test.agentgateway.internal
+  ingressNginx:
+    enabled: true
+    type: ingress
+    ingressClassName: nginx
+    hostname: test.nginx.internal
+
+scenarios:
+  bundled: true
+  custom: {}
+
+networkPolicy:
+  enabled: true
