@@ -1,0 +1,28 @@
+apiVersion: gw-bench/v1
+kind: Scenario
+metadata:
+  name: http-large-payload
+  description: |
+    Large 100KB payload at moderate QPS. Tests throughput and buffering
+    behavior under high bandwidth conditions.
+spec:
+  protocol: http
+  loadGenerator: fortio
+  duration: 60s
+  warmup: 10s
+  cooldown: 30s
+  targetQPS: 500
+  connections: 50
+  payload:
+    method: GET
+    path: /echo?size=102400
+    sizeBytes: 102400
+    headers:
+      X-Test-Run: gw-bench
+  gateways:
+    - name: agentgateway
+      url: http://test.agentgateway.internal/echo?size=102400
+      promPodSelector: 'app.kubernetes.io/name="agentgateway"'
+    - name: ingress-nginx
+      url: http://test.nginx.internal/echo?size=102400
+      promPodSelector: 'app.kubernetes.io/name="ingress-nginx"'

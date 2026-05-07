@@ -1,0 +1,26 @@
+apiVersion: gw-bench/v1
+kind: Scenario
+metadata:
+  name: sse-streaming
+  description: |
+    SSE streaming test. Opens connections through the gateway and validates
+    event delivery latency and stream reliability.
+spec:
+  protocol: sse
+  loadGenerator: k6
+  duration: 60s
+  warmup: 10s
+  cooldown: 30s
+  targetQPS: 0
+  connections: 50
+  k6Script: scripts/k6/sse-streaming.js
+  k6Args:
+    vus: "50"
+    duration: "60s"
+  gateways:
+    - name: agentgateway
+      url: http://test.agentgateway.internal/sse?count=10&interval_ms=100
+      promPodSelector: 'app.kubernetes.io/name="agentgateway"'
+    - name: ingress-nginx
+      url: http://test.nginx.internal/sse?count=10&interval_ms=100
+      promPodSelector: 'app.kubernetes.io/name="ingress-nginx"'

@@ -1,0 +1,26 @@
+apiVersion: gw-bench/v1
+kind: Scenario
+metadata:
+  name: mcp-tool-burst
+  description: |
+    MCP Streamable HTTP burst test. Drives tools/call against the test
+    backend's /mcp endpoint with realistic VU ramp and idle time.
+spec:
+  protocol: mcp
+  loadGenerator: k6
+  duration: 60s
+  warmup: 10s
+  cooldown: 30s
+  targetQPS: 0
+  connections: 50
+  k6Script: scripts/k6/mcp-burst.js
+  k6Args:
+    vus: "50"
+    duration: "60s"
+  gateways:
+    - name: agentgateway
+      url: http://test.agentgateway.internal/mcp
+      promPodSelector: 'app.kubernetes.io/name="agentgateway"'
+    - name: ingress-nginx
+      url: http://test.nginx.internal/mcp
+      promPodSelector: 'app.kubernetes.io/name="ingress-nginx"'

@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-scenarios
+  namespace: {{ include "gw-bench.namespace" . }}
+  labels:
+    {{- include "gw-bench.runnerLabels" . | nindent 4 }}
+data:
+  {{- if .Values.scenarios.bundled }}
+  http-small-5k-qps.yaml: |
+    apiVersion: gw-bench/v1
+    kind: Scenario
+    metadata:
+      name: http-small-5k-qps
+    spec:
+      protocol: http
+      loadGenerator: fortio
+      duration: 60s
+      warmup: 10s
+      cooldown: 30s
+      targetQPS: 5000
+      connections: 100
+      payload:
+        method: GET
+        path: /echo
+      gateways:
+        {{- range $name, $gw := .Values.gateways }}
+        {{- if $gw.enabled }}
+        - name: {{ $name }}
+          url: http://{{ $gw.hostname }}/echo
+          {{- if $gw.promPodSelector }}
+          promPodSelector: {{ $gw.promPodSelector | quote }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+  {{- end }}
+  {{- range $name, $content := .Values.scenarios.custom }}
+  {{ $name }}: |
+    {{- $content | nindent 4 }}
+  {{- end }}

@@ -1,0 +1,8 @@
+apiVersion: v2
+name: gw-bench
+description: Kubernetes-native A/B benchmark harness for ingress/Gateway API implementations
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: BenjaminBanwart

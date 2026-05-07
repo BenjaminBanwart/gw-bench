@@ -1,0 +1,26 @@
+{{- range $name, $gw := .Values.gateways }}
+{{- if and $gw.enabled (eq $gw.type "ingress") }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $.Release.Name }}-{{ $name }}
+  namespace: {{ include "gw-bench.namespace" $ }}
+  labels:
+    {{- include "gw-bench.backendLabels" $ | nindent 4 }}
+    gw-bench/gateway: {{ $name }}
+spec:
+  ingressClassName: {{ $gw.ingressClassName }}
+  rules:
+    - host: {{ $gw.hostname | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $.Release.Name }}-backend
+                port:
+                  number: {{ $.Values.backend.port | default 8080 }}
+{{- end }}
+{{- end }}

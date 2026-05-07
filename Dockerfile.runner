@@ -1,0 +1,15 @@
+FROM golang:1.22-alpine AS builder
+RUN apk add --no-cache git
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -ldflags "-X main.version=${VERSION:-dev} -X main.commit=${COMMIT:-none} -X main.date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" -o /gw-bench ./cmd/gw-bench/
+
+FROM fortio/fortio:latest AS fortio
+
+FROM alpine:3.20
+RUN apk add --no-cache ca-certificates
+COPY --from=fortio /usr/bin/fortio /usr/local/bin/fortio
+COPY --from=builder /gw-bench /usr/local/bin/gw-bench
+ENTRYPOINT ["gw-bench"]

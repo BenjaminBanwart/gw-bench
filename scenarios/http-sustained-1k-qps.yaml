@@ -1,0 +1,28 @@
+apiVersion: gw-bench/v1
+kind: Scenario
+metadata:
+  name: http-sustained-1k-qps
+  description: |
+    Sustained 1k QPS over a longer 5-minute window. Tests stability
+    and resource consumption under steady-state load.
+spec:
+  protocol: http
+  loadGenerator: fortio
+  duration: 300s
+  warmup: 30s
+  cooldown: 30s
+  targetQPS: 1000
+  connections: 50
+  payload:
+    method: GET
+    path: /echo
+    sizeBytes: 0
+    headers:
+      X-Test-Run: gw-bench
+  gateways:
+    - name: agentgateway
+      url: http://test.agentgateway.internal/echo
+      promPodSelector: 'app.kubernetes.io/name="agentgateway"'
+    - name: ingress-nginx
+      url: http://test.nginx.internal/echo
+      promPodSelector: 'app.kubernetes.io/name="ingress-nginx"'
