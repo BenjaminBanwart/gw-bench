@@ -31,7 +31,7 @@ func main() {
 
 func handleHealthz(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, "ok")
+	_, _ = fmt.Fprintln(w, "ok")
 }
 
 func handleEcho(w http.ResponseWriter, r *http.Request) {
@@ -53,15 +53,15 @@ func handleEcho(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Length", strconv.Itoa(size))
 		// Use a deterministic-ish pattern for reproducibility
 		buf := make([]byte, size)
-		rand.Read(buf)
-		w.Write(buf)
+		_, _ = rand.Read(buf)
+		_, _ = w.Write(buf)
 		return
 	}
 
 	// Otherwise echo the request body
 	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
 	if r.Body != nil {
-		io.Copy(w, r.Body)
+		_, _ = io.Copy(w, r.Body)
 	}
 }
 
@@ -97,7 +97,7 @@ func handleSSE(w http.ResponseWriter, r *http.Request) {
 		default:
 		}
 
-		fmt.Fprintf(w, "id: %d\nevent: message\ndata: {\"seq\":%d,\"ts\":%d}\n\n",
+		_, _ = fmt.Fprintf(w, "id: %d\nevent: message\ndata: {\"seq\":%d,\"ts\":%d}\n\n",
 			i, i, time.Now().UnixMilli())
 		flusher.Flush()
 

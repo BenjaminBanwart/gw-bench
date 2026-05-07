@@ -44,7 +44,7 @@ func Emit(event any) {
 		fmt.Fprintf(os.Stderr, "gw-bench: failed to marshal event: %v\n", err)
 		return
 	}
-	fmt.Fprintln(os.Stdout, string(data))
+	_, _ = fmt.Fprintln(os.Stdout, string(data))
 }
 
 // EmitRunStart emits a run_start event.

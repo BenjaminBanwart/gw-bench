@@ -39,7 +39,7 @@ func (k *K6) Run(ctx context.Context, scenario *config.Scenario, target config.G
 	defer cancel()
 
 	summaryPath := filepath.Join(os.TempDir(), fmt.Sprintf("k6-summary-%d.json", time.Now().UnixNano()))
-	defer os.Remove(summaryPath)
+	defer func() { _ = os.Remove(summaryPath) }()
 
 	args := []string{
 		"run",
