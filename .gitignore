@@ -27,6 +27,9 @@ go.work.sum
 # env file
 .env
 
+# Helm packages
+*.tgz
+
 # Editor/IDE
 # .idea/
 # .vscode/
