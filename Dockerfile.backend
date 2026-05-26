@@ -5,8 +5,11 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 go build -o /test-backend ./cmd/test-backend/
+RUN grep nobody /etc/passwd > /tmp/passwd && mv /tmp/passwd /etc/passwd
 
 FROM scratch
+COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /test-backend /test-backend
+USER 65534:65534
 EXPOSE 8080
 ENTRYPOINT ["/test-backend"]
