@@ -116,14 +116,8 @@ func TestQueryGatewayResources_EmptyResult(t *testing.T) {
 	defer server.Close()
 
 	client := NewPrometheusClient(server.URL)
-	resources, err := client.QueryGatewayResources(context.Background(), `app="test"`, time.Now(), time.Now().Add(time.Minute))
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if resources.CPUAvgCores != 0 {
-		t.Errorf("expected 0 CPU avg for empty result, got %f", resources.CPUAvgCores)
-	}
-	if resources.Samples != 0 {
-		t.Errorf("expected 0 samples for empty result, got %d", resources.Samples)
+	_, err := client.QueryGatewayResources(context.Background(), `app="test"`, time.Now(), time.Now().Add(time.Minute))
+	if err == nil {
+		t.Fatal("expected error for empty result (no matching pods)")
 	}
 }

@@ -79,6 +79,7 @@ func (f *Fortio) runFortio(ctx context.Context, scenario *config.Scenario, targe
 		"-qps", fmt.Sprintf("%d", scenario.Spec.TargetQPS),
 		"-t", duration.String(),
 		"-c", fmt.Sprintf("%d", scenario.Spec.Connections),
+		"-p", "50,95,99,99.9",
 		"-json", "/dev/stdout",
 	}
 
@@ -92,6 +93,10 @@ func (f *Fortio) runFortio(ctx context.Context, scenario *config.Scenario, targe
 		if scenario.Spec.Payload.Body != "" {
 			args = append(args, "-payload", scenario.Spec.Payload.Body)
 		}
+	}
+
+	if scenario.Spec.NoKeepAlive {
+		args = append(args, "-keepalive=false")
 	}
 
 	args = append(args, target.URL)

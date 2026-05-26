@@ -68,7 +68,7 @@ runner:
     schedule: "0 2 * * 0"
   scenarios:
     - http-small-5k-qps
-    - http-large-payload
+    - http-medium-payload
     - http-sustained-1k-qps
   prometheus:
     url: ""

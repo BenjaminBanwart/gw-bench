@@ -20,6 +20,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handleHealthz)
 	mux.HandleFunc("/echo", handleEcho)
+	mux.HandleFunc("/route/", handleEcho) // catch-all for many-routes scenarios
 	mux.HandleFunc("/sse", handleSSE)
 	mux.HandleFunc("/mcp", handleMCP)
 
@@ -45,8 +46,8 @@ func handleEcho(w http.ResponseWriter, r *http.Request) {
 	// If ?size=N, return N bytes of random data
 	if sizeStr := r.URL.Query().Get("size"); sizeStr != "" {
 		size, err := strconv.Atoi(sizeStr)
-		if err != nil || size < 0 || size > 10*1024*1024 { // 10MB max
-			http.Error(w, "invalid size parameter (0-10485760)", http.StatusBadRequest)
+		if err != nil || size < 0 || size > 200*1024*1024 { // 200MB max
+			http.Error(w, "invalid size parameter (0-209715200)", http.StatusBadRequest)
 			return
 		}
 		w.Header().Set("Content-Type", "application/octet-stream")

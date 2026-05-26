@@ -31,6 +31,7 @@ type Spec struct {
 	Cooldown      string            `yaml:"cooldown,omitempty" json:"cooldown,omitempty"`
 	TargetQPS     int               `yaml:"targetQPS" json:"targetQPS"`
 	Connections   int               `yaml:"connections" json:"connections"`
+	NoKeepAlive   bool              `yaml:"noKeepAlive,omitempty" json:"noKeepAlive,omitempty"`
 	Payload       *Payload          `yaml:"payload,omitempty" json:"payload,omitempty"`
 	K6Script      string            `yaml:"k6Script,omitempty" json:"k6Script,omitempty"`
 	K6Args        map[string]string `yaml:"k6Args,omitempty" json:"k6Args,omitempty"`
