@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "[0-9]+.[0-9]+.[0-9]+"
+      - "v*"
 
 permissions:
   contents: write
@@ -29,6 +29,10 @@ jobs:
         id: owner
         run: echo "name=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
+      - name: Strip v prefix
+        id: version
+        run: echo "bare=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -47,7 +51,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ steps.owner.outputs.name }}/${{ matrix.image }}:${{ github.ref_name }}
+            ${{ env.REGISTRY }}/${{ steps.owner.outputs.name }}/${{ matrix.image }}:${{ steps.version.outputs.bare }}
             ${{ env.REGISTRY }}/${{ steps.owner.outputs.name }}/${{ matrix.image }}:latest
 
   helm-release:
@@ -56,12 +60,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Strip v prefix
+        id: version
+        run: echo "bare=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
       - name: Set up Helm
         uses: azure/setup-helm@v4
 
       - name: Package Helm chart
         run: |
-          helm package deploy/helm/gw-bench/ --version ${{ github.ref_name }} --app-version ${{ github.ref_name }}
+          helm package deploy/helm/gw-bench/ --version ${{ steps.version.outputs.bare }} --app-version ${{ steps.version.outputs.bare }}
 
       - name: Upload chart to release
         uses: softprops/action-gh-release@v2
@@ -75,7 +83,7 @@ jobs:
 
       - name: Push chart to Docker Hub OCI
         run: |
-          helm push gw-bench-${{ github.ref_name }}.tgz oci://registry-1.docker.io/benjaminbanwart
+          helm push gw-bench-${{ steps.version.outputs.bare }}.tgz oci://registry-1.docker.io/benjaminbanwart
 
   github-release:
     runs-on: ubuntu-latest
