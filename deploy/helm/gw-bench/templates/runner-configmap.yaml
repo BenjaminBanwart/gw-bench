@@ -27,7 +27,7 @@ data:
         {{- range $name, $gw := .Values.gateways }}
         {{- if $gw.enabled }}
         - name: {{ $name }}
-          url: http://{{ $gw.hostname }}/echo
+          url: {{ $gw.scheme | default "https" }}://{{ $gw.hostname }}/echo
           {{- if $gw.promPodSelector }}
           promPodSelector: {{ $gw.promPodSelector | quote }}
           {{- end }}
@@ -59,7 +59,7 @@ data:
         {{- range $name, $gw := .Values.gateways }}
         {{- if $gw.enabled }}
         - name: {{ $name }}
-          url: http://{{ $gw.hostname }}/echo?size=102400
+          url: {{ $gw.scheme | default "https" }}://{{ $gw.hostname }}/echo?size=102400
           {{- if $gw.promPodSelector }}
           promPodSelector: {{ $gw.promPodSelector | quote }}
           {{- end }}
@@ -91,7 +91,7 @@ data:
         {{- range $name, $gw := .Values.gateways }}
         {{- if $gw.enabled }}
         - name: {{ $name }}
-          url: http://{{ $gw.hostname }}/echo
+          url: {{ $gw.scheme | default "https" }}://{{ $gw.hostname }}/echo
           {{- if $gw.promPodSelector }}
           promPodSelector: {{ $gw.promPodSelector | quote }}
           {{- end }}
@@ -121,7 +121,7 @@ data:
         {{- range $name, $gw := .Values.gateways }}
         {{- if $gw.enabled }}
         - name: {{ $name }}
-          url: http://{{ $gw.hostname }}/mcp
+          url: {{ $gw.scheme | default "https" }}://{{ $gw.hostname }}/mcp
           {{- if $gw.promPodSelector }}
           promPodSelector: {{ $gw.promPodSelector | quote }}
           {{- end }}
@@ -151,7 +151,7 @@ data:
         {{- range $name, $gw := .Values.gateways }}
         {{- if $gw.enabled }}
         - name: {{ $name }}
-          url: http://{{ $gw.hostname }}/sse?count=10&interval_ms=100
+          url: {{ $gw.scheme | default "https" }}://{{ $gw.hostname }}/sse?count=10&interval_ms=100
           {{- if $gw.promPodSelector }}
           promPodSelector: {{ $gw.promPodSelector | quote }}
           {{- end }}
