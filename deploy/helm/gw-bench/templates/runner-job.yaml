@@ -25,6 +25,8 @@ spec:
             - name: runner
               image: {{ include "gw-bench.runnerImage" . }}
               imagePullPolicy: {{ .Values.runner.image.pullPolicy | default "IfNotPresent" }}
+              securityContext:
+                {{- toYaml .Values.runner.securityContext | nindent 16 }}
               command: ["gw-bench", "run", "/scenarios/{{ .Values.runner.defaultScenario }}.yaml"]
               env:
                 - name: CLUSTER_NAME
