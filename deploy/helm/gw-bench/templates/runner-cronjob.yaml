@@ -21,6 +21,8 @@ spec:
         spec:
           serviceAccountName: {{ include "gw-bench.serviceAccountName" . }}
           restartPolicy: Never
+          securityContext:
+            {{- toYaml .Values.runner.podSecurityContext | nindent 12 }}
           containers:
             - name: runner
               image: {{ include "gw-bench.runnerImage" . }}

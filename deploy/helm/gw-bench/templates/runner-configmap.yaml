@@ -33,6 +33,130 @@ data:
           {{- end }}
         {{- end }}
         {{- end }}
+  http-large-payload.yaml: |
+    apiVersion: gw-bench/v1
+    kind: Scenario
+    metadata:
+      name: http-large-payload
+      description: |
+        Large 100KB payload at moderate QPS. Tests throughput and buffering
+        behavior under high bandwidth conditions.
+    spec:
+      protocol: http
+      loadGenerator: fortio
+      duration: 60s
+      warmup: 10s
+      cooldown: 30s
+      targetQPS: 500
+      connections: 50
+      payload:
+        method: GET
+        path: /echo?size=102400
+        sizeBytes: 102400
+        headers:
+          X-Test-Run: gw-bench
+      gateways:
+        {{- range $name, $gw := .Values.gateways }}
+        {{- if $gw.enabled }}
+        - name: {{ $name }}
+          url: http://{{ $gw.hostname }}/echo?size=102400
+          {{- if $gw.promPodSelector }}
+          promPodSelector: {{ $gw.promPodSelector | quote }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+  http-sustained-1k-qps.yaml: |
+    apiVersion: gw-bench/v1
+    kind: Scenario
+    metadata:
+      name: http-sustained-1k-qps
+      description: |
+        Sustained 1k QPS over a longer 5-minute window. Tests stability
+        and resource consumption under steady-state load.
+    spec:
+      protocol: http
+      loadGenerator: fortio
+      duration: 300s
+      warmup: 30s
+      cooldown: 30s
+      targetQPS: 1000
+      connections: 50
+      payload:
+        method: GET
+        path: /echo
+        sizeBytes: 0
+        headers:
+          X-Test-Run: gw-bench
+      gateways:
+        {{- range $name, $gw := .Values.gateways }}
+        {{- if $gw.enabled }}
+        - name: {{ $name }}
+          url: http://{{ $gw.hostname }}/echo
+          {{- if $gw.promPodSelector }}
+          promPodSelector: {{ $gw.promPodSelector | quote }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+  mcp-tool-burst.yaml: |
+    apiVersion: gw-bench/v1
+    kind: Scenario
+    metadata:
+      name: mcp-tool-burst
+      description: |
+        MCP Streamable HTTP burst test. Drives tools/call against the test
+        backend's /mcp endpoint with realistic VU ramp and idle time.
+    spec:
+      protocol: mcp
+      loadGenerator: k6
+      duration: 60s
+      warmup: 10s
+      cooldown: 30s
+      targetQPS: 0
+      connections: 50
+      k6Script: scripts/k6/mcp-burst.js
+      k6Args:
+        vus: "50"
+        duration: "60s"
+      gateways:
+        {{- range $name, $gw := .Values.gateways }}
+        {{- if $gw.enabled }}
+        - name: {{ $name }}
+          url: http://{{ $gw.hostname }}/mcp
+          {{- if $gw.promPodSelector }}
+          promPodSelector: {{ $gw.promPodSelector | quote }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+  sse-streaming.yaml: |
+    apiVersion: gw-bench/v1
+    kind: Scenario
+    metadata:
+      name: sse-streaming
+      description: |
+        SSE streaming test. Opens connections through the gateway and validates
+        event delivery latency and stream reliability.
+    spec:
+      protocol: sse
+      loadGenerator: k6
+      duration: 60s
+      warmup: 10s
+      cooldown: 30s
+      targetQPS: 0
+      connections: 50
+      k6Script: scripts/k6/sse-streaming.js
+      k6Args:
+        vus: "50"
+        duration: "60s"
+      gateways:
+        {{- range $name, $gw := .Values.gateways }}
+        {{- if $gw.enabled }}
+        - name: {{ $name }}
+          url: http://{{ $gw.hostname }}/sse?count=10&interval_ms=100
+          {{- if $gw.promPodSelector }}
+          promPodSelector: {{ $gw.promPodSelector | quote }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
   {{- end }}
   {{- range $name, $content := .Values.scenarios.custom }}
   {{ $name }}: |

@@ -16,6 +16,8 @@ spec:
       labels:
         {{- include "gw-bench.backendSelectorLabels" . | nindent 8 }}
     spec:
+      securityContext:
+        {{- toYaml .Values.backend.podSecurityContext | nindent 8 }}
       containers:
         - name: backend
           image: {{ include "gw-bench.backendImage" . }}
