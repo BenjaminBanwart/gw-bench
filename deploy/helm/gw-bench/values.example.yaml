@@ -42,7 +42,10 @@ runner:
   cronjob:
     enabled: false
     schedule: "0 2 * * 0"
-  defaultScenario: http-small-5k-qps
+  scenarios:
+    - http-small-5k-qps
+    - http-large-payload
+    - http-sustained-1k-qps
   prometheus:
     url: http://prometheus-operated.monitoring.svc:9090
   clusterName: lab
