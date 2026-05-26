@@ -39,8 +39,40 @@ data:
     metadata:
       name: http-large-payload
       description: |
-        Large 100KB payload at moderate QPS. Tests throughput and buffering
+        Large 100MB payload at moderate QPS. Tests throughput and buffering
         behavior under high bandwidth conditions.
+    spec:
+      protocol: http
+      loadGenerator: fortio
+      duration: 60s
+      warmup: 10s
+      cooldown: 30s
+      targetQPS: 500
+      connections: 50
+      payload:
+        method: GET
+        path: /echo?size=104857600
+        sizeBytes: 104857600
+        headers:
+          X-Test-Run: gw-bench
+      gateways:
+        {{- range $name, $gw := .Values.gateways }}
+        {{- if $gw.enabled }}
+        - name: {{ $name }}
+          url: {{ $gw.scheme | default "https" }}://{{ $gw.hostname }}/echo?size=104857600
+          {{- if $gw.promPodSelector }}
+          promPodSelector: {{ $gw.promPodSelector | quote }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+  http-medium-payload.yaml: |
+    apiVersion: gw-bench/v1
+    kind: Scenario
+    metadata:
+      name: http-medium-payload
+      description: |
+        Medium 100KB payload at moderate QPS. Tests throughput and buffering
+        behavior under moderate bandwidth conditions.
     spec:
       protocol: http
       loadGenerator: fortio
@@ -152,6 +184,70 @@ data:
         {{- if $gw.enabled }}
         - name: {{ $name }}
           url: {{ $gw.scheme | default "https" }}://{{ $gw.hostname }}/sse?count=10&interval_ms=100
+          {{- if $gw.promPodSelector }}
+          promPodSelector: {{ $gw.promPodSelector | quote }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+  tls-connection-churn.yaml: |
+    apiVersion: gw-bench/v1
+    kind: Scenario
+    metadata:
+      name: tls-connection-churn
+      description: |
+        TLS connection churn test. Disables keepalive so every request forces
+        a new TCP+TLS handshake through the gateway. Measures TLS termination
+        overhead and connection setup latency under moderate load.
+    spec:
+      protocol: http
+      loadGenerator: fortio
+      duration: 60s
+      warmup: 10s
+      cooldown: 30s
+      targetQPS: 500
+      connections: 50
+      noKeepAlive: true
+      payload:
+        method: GET
+        path: /echo
+        headers:
+          X-Test-Run: gw-bench
+      gateways:
+        {{- range $name, $gw := .Values.gateways }}
+        {{- if $gw.enabled }}
+        - name: {{ $name }}
+          url: {{ $gw.scheme | default "https" }}://{{ $gw.hostname }}/echo
+          {{- if $gw.promPodSelector }}
+          promPodSelector: {{ $gw.promPodSelector | quote }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+  many-routes.yaml: |
+    apiVersion: gw-bench/v1
+    kind: Scenario
+    metadata:
+      name: many-routes
+      description: |
+        Many-routes fan-out test. Distributes requests uniformly across 500
+        distinct /route/{N} paths to stress the gateway's routing table
+        lookup and match performance.
+    spec:
+      protocol: http
+      loadGenerator: k6
+      duration: 60s
+      warmup: 10s
+      cooldown: 30s
+      targetQPS: 0
+      connections: 100
+      k6Script: scripts/k6/many-routes.js
+      k6Args:
+        vus: "100"
+        duration: "60s"
+      gateways:
+        {{- range $name, $gw := .Values.gateways }}
+        {{- if $gw.enabled }}
+        - name: {{ $name }}
+          url: {{ $gw.scheme | default "https" }}://{{ $gw.hostname }}/route
           {{- if $gw.promPodSelector }}
           promPodSelector: {{ $gw.promPodSelector | quote }}
           {{- end }}

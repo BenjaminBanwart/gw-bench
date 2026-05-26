@@ -51,16 +51,22 @@ func (c *PrometheusClient) QueryGatewayResources(ctx context.Context, podSelecto
 	if err != nil {
 		return nil, fmt.Errorf("querying CPU metrics: %w", err)
 	}
-	resources.CPUAvgCores = cpuAvg
-	resources.CPUMaxCores = cpuMax
-	resources.Samples = cpuSamples
 
 	// Query memory usage
 	memQuery := fmt.Sprintf(`container_memory_working_set_bytes{%s,container!="POD",container!=""}`, podSelector)
-	memAvg, memMax, _, err := c.queryRangeAggregates(ctx, memQuery, start, end)
+	memAvg, memMax, memSamples, err := c.queryRangeAggregates(ctx, memQuery, start, end)
 	if err != nil {
 		return nil, fmt.Errorf("querying memory metrics: %w", err)
 	}
+
+	// If neither query returned data, the selector likely doesn't match any pods
+	if cpuSamples == 0 && memSamples == 0 {
+		return nil, fmt.Errorf("no resource metrics found for selector %q", podSelector)
+	}
+
+	resources.CPUAvgCores = cpuAvg
+	resources.CPUMaxCores = cpuMax
+	resources.Samples = cpuSamples
 	resources.MemAvgMB = memAvg / 1024 / 1024
 	resources.MemMaxMB = memMax / 1024 / 1024
 

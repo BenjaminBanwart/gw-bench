@@ -1,10 +1,11 @@
 apiVersion: gw-bench/v1
 kind: Scenario
 metadata:
-  name: http-large-payload
+  name: tls-connection-churn
   description: |
-    Large 100MB payload at moderate QPS. Tests throughput and buffering
-    behavior under high bandwidth conditions.
+    TLS connection churn test. Disables keepalive so every request forces
+    a new TCP+TLS handshake through the gateway. Measures TLS termination
+    overhead and connection setup latency under moderate load.
 spec:
   protocol: http
   loadGenerator: fortio
@@ -13,16 +14,16 @@ spec:
   cooldown: 30s
   targetQPS: 500
   connections: 50
+  noKeepAlive: true
   payload:
     method: GET
-    path: /echo?size=104857600
-    sizeBytes: 104857600
+    path: /echo
     headers:
       X-Test-Run: gw-bench
   gateways:
     - name: agentgateway
-      url: http://test.agentgateway.internal/echo?size=104857600
+      url: https://test.agentgateway.internal/echo
       promPodSelector: 'app.kubernetes.io/name="agentgateway"'
     - name: ingress-nginx
-      url: http://test.nginx.internal/echo?size=104857600
+      url: https://test.nginx.internal/echo
       promPodSelector: 'app.kubernetes.io/name="ingress-nginx"'

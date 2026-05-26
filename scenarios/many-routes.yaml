@@ -1,0 +1,28 @@
+apiVersion: gw-bench/v1
+kind: Scenario
+metadata:
+  name: many-routes
+  description: |
+    Many-routes fan-out test. Distributes requests uniformly across 500
+    distinct /route/{N} paths to stress the gateway's routing table
+    lookup and match performance. Requires the gateway under test to
+    have 500 HTTPRoute/Ingress rules pointing to the test backend.
+spec:
+  protocol: http
+  loadGenerator: k6
+  duration: 60s
+  warmup: 10s
+  cooldown: 30s
+  targetQPS: 0
+  connections: 100
+  k6Script: scripts/k6/many-routes.js
+  k6Args:
+    vus: "100"
+    duration: "60s"
+  gateways:
+    - name: agentgateway
+      url: https://test.agentgateway.internal/route
+      promPodSelector: 'app.kubernetes.io/name="agentgateway"'
+    - name: ingress-nginx
+      url: https://test.nginx.internal/route
+      promPodSelector: 'app.kubernetes.io/name="ingress-nginx"'
