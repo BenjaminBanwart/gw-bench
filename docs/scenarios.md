@@ -19,6 +19,7 @@ spec:
   cooldown: <go-duration>        # Pause between gateways (default: 30s)
   targetQPS: <int>               # 0 = saturate
   connections: <int>
+  noKeepAlive: <bool>            # Disable keepalive (force new conn per request)
   payload:                       # Required for fortio
     method: GET | POST
     path: /echo
@@ -48,6 +49,28 @@ spec:
 - `fortio` requires `payload`; `k6` requires `k6Script`
 - `mcp` protocol requires `k6` load generator
 - At least one gateway is required
+
+## Canonical Scenarios
+
+The following scenarios ship in the `scenarios/` directory.
+
+### HTTP / Fortio
+
+| Scenario | QPS | Connections | Payload | Duration | Notes |
+|---|---|---|---|---|---|
+| `http-small-5k-qps` | 5,000 | 100 | 0 B | 60 s | Baseline latency test with no payload |
+| `http-medium-payload` | 500 | 50 | 100 KB | 60 s | Throughput and buffering at moderate bandwidth |
+| `http-large-payload` | 10 | 5 | 100 MB | 60 s | Throughput and buffering at high bandwidth |
+| `http-sustained-1k-qps` | 1,000 | 50 | 0 B | 300 s | 5-minute steady-state stability test |
+| `tls-connection-churn` | 500 | 50 | 0 B | 60 s | `noKeepAlive: true` — new TCP+TLS handshake per request; measures TLS termination overhead |
+
+### K6
+
+| Scenario | Protocol | VUs | Duration | Notes |
+|---|---|---|---|---|
+| `many-routes` | HTTP | 100 | 60 s | Fan-out across 500 `/route/{N}` paths; stresses routing table lookup performance |
+| `sse-streaming` | SSE | 50 | 60 s | Opens SSE streams (10 events at 100 ms intervals) and validates event delivery |
+| `mcp-tool-burst` | MCP | 50 | 60 s | MCP Streamable HTTP — initialize → tools/list → tools/call burst with idle gaps |
 
 ## Tips
 

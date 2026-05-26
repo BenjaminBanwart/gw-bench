@@ -1,9 +1,12 @@
+# ─── Test Backend ────────────────────────────────────────────────
+# The deterministic HTTP server that all gateways route to.
+# Endpoints: /echo, /sse, /mcp
 backend:
   enabled: true
   image:
     repository: ghcr.io/benjaminbanwart/gw-bench-backend
     tag: "0.1.0"
-  replicas: 2
+  replicas: 2          # Two replicas for realistic load balancing behavior
   resources:
     requests:
       cpu: 500m
@@ -20,6 +23,9 @@ backend:
       drop:
         - ALL
 
+# ─── Runner ──────────────────────────────────────────────────────
+# The benchmark job that shells out to fortio/k6, queries Prometheus,
+# and emits structured NDJSON results to stdout.
 runner:
   image:
     repository: ghcr.io/benjaminbanwart/gw-bench
@@ -29,7 +35,7 @@ runner:
       cpu: "1"
       memory: 1Gi
     limits:
-      cpu: "4"
+      cpu: "4"          # Generous limits — load generators are CPU-hungry
       memory: 4Gi
   securityContext:
     allowPrivilegeEscalation: false
@@ -39,36 +45,54 @@ runner:
     capabilities:
       drop:
         - ALL
+  # CronJob configuration — set enabled: true to run on a schedule
   cronjob:
     enabled: false
-    schedule: "0 2 * * 0"
+    schedule: "0 2 * * 0"   # Weekly at 2 AM Sunday (cron expression)
+  # Which bundled scenarios to execute (names from scenarios/ directory)
   scenarios:
     - http-small-5k-qps
-    - http-large-payload
+    - http-medium-payload
     - http-sustained-1k-qps
+  # Prometheus URL for collecting gateway pod CPU/memory during tests.
+  # Leave empty to skip resource metrics (benchmarks still run).
   prometheus:
     url: http://prometheus-operated.monitoring.svc:9090
-  clusterName: lab
+  # Cluster identifier included in every emitted event for multi-cluster setups
+  clusterName: "cluster-001"
 
+# ─── Gateways ────────────────────────────────────────────────────
+# Define the gateways to benchmark. The chart creates HTTPRoute or Ingress
+# resources for each enabled gateway, pointing to the test backend.
+# Hostnames must be resolvable inside the cluster (see README for DNS setup).
 gateways:
+  # Gateway API implementation (e.g. Envoy Gateway, agentgateway, Istio)
   agentgateway:
     enabled: true
-    type: gatewayApi
-    scheme: https
+    type: gatewayApi          # Creates an HTTPRoute resource
+    scheme: https             # http or https — used in scenario gateway URLs
     parentRef:
-      name: agentgateway
-      namespace: agentgateway-system
+      name: agentgateway              # Name of the Gateway resource
+      namespace: agentgateway-system  # Namespace where the Gateway lives
     hostname: test.agentgateway.internal
+
+  # Ingress implementation (e.g. ingress-nginx, Traefik, HAProxy)
   ingressNginx:
     enabled: true
-    type: ingress
+    type: ingress             # Creates an Ingress resource
     scheme: https
-    ingressClassName: nginx
+    ingressClassName: nginx   # Must match your IngressClass name
     hostname: test.nginx.internal
 
+# ─── Scenario Bundling ───────────────────────────────────────────
+# When bundled: true, all YAML files from scenarios/ are mounted into the
+# runner pod via ConfigMap. Set custom: {} to add extra scenarios inline.
 scenarios:
   bundled: true
   custom: {}
 
+# ─── Network Policy ─────────────────────────────────────────────
+# Creates a Cilium/Calico-compatible NetworkPolicy restricting traffic
+# to/from the gw-bench namespace.
 networkPolicy:
   enabled: true

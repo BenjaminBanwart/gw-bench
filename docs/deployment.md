@@ -43,10 +43,6 @@ kubectl create job gw-bench-run-001 \
 kubectl logs job/gw-bench-run-001 -n gw-bench
 ```
 
-## ArgoCD Deployment
-
-See [deploy/argocd/README.md](../../deploy/argocd/README.md) for ApplicationSet-based deployment across multiple clusters.
-
 ## Networking Requirements
 
 - The runner pod must be able to reach gateway URLs (HTTP)
