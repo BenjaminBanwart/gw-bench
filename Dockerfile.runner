@@ -9,9 +9,7 @@ RUN CGO_ENABLED=0 go build -ldflags "-X main.version=${VERSION:-dev} -X main.com
 FROM fortio/fortio:latest AS fortio
 
 FROM alpine:3.20
-RUN apk add --no-cache ca-certificates && \
-    addgroup -g 65534 -S appgroup && \
-    adduser -u 65534 -S appuser -G appgroup
+RUN apk add --no-cache ca-certificates
 COPY --from=fortio /usr/bin/fortio /usr/local/bin/fortio
 COPY --from=builder /gw-bench /usr/local/bin/gw-bench
 USER 65534:65534
