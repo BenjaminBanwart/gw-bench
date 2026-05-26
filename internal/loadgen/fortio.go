@@ -95,6 +95,16 @@ func (f *Fortio) runFortio(ctx context.Context, scenario *config.Scenario, targe
 		}
 	}
 
+	// For large payloads (>1MB), increase Fortio's HTTP buffer and per-request timeout.
+	const largePayloadThreshold = 1024 * 1024
+	if scenario.Spec.Payload != nil && scenario.Spec.Payload.SizeBytes > largePayloadThreshold {
+		bufKB := scenario.Spec.Payload.SizeBytes/1024 + 128
+		args = append(args, "-httpbufferkb", fmt.Sprintf("%d", bufKB))
+		// Per-request timeout proportional to payload size, minimum 15s.
+		timeoutSec := scenario.Spec.Payload.SizeBytes/(5*1024*1024) + 15
+		args = append(args, "-timeout", fmt.Sprintf("%ds", timeoutSec))
+	}
+
 	if scenario.Spec.NoKeepAlive {
 		args = append(args, "-keepalive=false")
 	}

@@ -52,10 +52,22 @@ func handleEcho(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Header().Set("Content-Type", "application/octet-stream")
 		w.Header().Set("Content-Length", strconv.Itoa(size))
-		// Use a deterministic-ish pattern for reproducibility
-		buf := make([]byte, size)
+		// Stream in fixed-size chunks to avoid large allocations.
+		const chunkSize = 32 * 1024
+		buf := make([]byte, chunkSize)
 		_, _ = rand.Read(buf)
-		_, _ = w.Write(buf)
+		remaining := size
+		for remaining > 0 {
+			n := chunkSize
+			if remaining < n {
+				n = remaining
+			}
+			written, err := w.Write(buf[:n])
+			if err != nil {
+				return
+			}
+			remaining -= written
+		}
 		return
 	}
 
