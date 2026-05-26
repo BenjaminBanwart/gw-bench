@@ -11,8 +11,8 @@ spec:
   duration: 60s
   warmup: 10s
   cooldown: 30s
-  targetQPS: 500
-  connections: 50
+  targetQPS: 10
+  connections: 5
   payload:
     method: GET
     path: /echo?size=104857600
