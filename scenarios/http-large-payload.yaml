@@ -3,7 +3,7 @@ kind: Scenario
 metadata:
   name: http-large-payload
   description: |
-    Large 100MB payload at moderate QPS. Tests throughput and buffering
+    Large 70MB payload at moderate QPS. Tests throughput and buffering
     behavior under high bandwidth conditions.
 spec:
   protocol: http
@@ -15,14 +15,14 @@ spec:
   connections: 5
   payload:
     method: GET
-    path: /echo?size=104857600
-    sizeBytes: 104857600
+    path: /echo?size=73400320
+    sizeBytes: 73400320
     headers:
       X-Test-Run: gw-bench
   gateways:
     - name: agentgateway
-      url: http://test.agentgateway.internal/echo?size=104857600
+      url: http://test.agentgateway.internal/echo?size=73400320
       promPodSelector: 'app.kubernetes.io/name="agentgateway"'
     - name: ingress-nginx
-      url: http://test.nginx.internal/echo?size=104857600
+      url: http://test.nginx.internal/echo?size=73400320
       promPodSelector: 'app.kubernetes.io/name="ingress-nginx"'

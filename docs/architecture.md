@@ -1,6 +1,6 @@
 # Architecture
 
-See [overview.md](../overview.md) for the full architectural design document.
+See [original-design-doc.md](original-design-doc.md) for the full architectural design document.
 
 ## Key Components
 
