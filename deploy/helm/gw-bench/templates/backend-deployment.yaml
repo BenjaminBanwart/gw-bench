@@ -20,6 +20,8 @@ spec:
         - name: backend
           image: {{ include "gw-bench.backendImage" . }}
           imagePullPolicy: {{ .Values.backend.image.pullPolicy | default "IfNotPresent" }}
+          securityContext:
+            {{- toYaml .Values.backend.securityContext | nindent 12 }}
           ports:
             - containerPort: {{ .Values.backend.port | default 8080 }}
               name: http

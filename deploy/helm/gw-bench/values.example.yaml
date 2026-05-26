@@ -11,6 +11,14 @@ backend:
     limits:
       cpu: "2"
       memory: 2Gi
+  securityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+        - ALL
 
 runner:
   image:
@@ -23,6 +31,14 @@ runner:
     limits:
       cpu: "4"
       memory: 4Gi
+  securityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+    capabilities:
+      drop:
+        - ALL
   cronjob:
     enabled: false
     schedule: "0 2 * * 0"
