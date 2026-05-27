@@ -14,5 +14,6 @@ RUN apk add --no-cache ca-certificates
 COPY --from=fortio /usr/bin/fortio /usr/local/bin/fortio
 COPY --from=k6 /usr/bin/k6 /usr/local/bin/k6
 COPY --from=builder /gw-bench /usr/local/bin/gw-bench
+COPY scripts/k6/ /scripts/k6/
 USER 65534:65534
 ENTRYPOINT ["gw-bench"]
