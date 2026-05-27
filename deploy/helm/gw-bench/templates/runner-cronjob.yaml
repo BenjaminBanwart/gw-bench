@@ -47,8 +47,13 @@ spec:
                 - name: scenarios
                   mountPath: /scenarios
                   readOnly: true
+                - name: tmp
+                  mountPath: /tmp
           volumes:
             - name: scenarios
               configMap:
                 name: {{ .Release.Name }}-scenarios
+            - name: tmp
+              emptyDir:
+                sizeLimit: 64Mi
 {{- end }}
