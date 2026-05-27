@@ -71,10 +71,10 @@ func handleEcho(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Otherwise echo the request body
+	// Otherwise echo the request body (capped at 10MB)
 	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
 	if r.Body != nil {
-		_, _ = io.Copy(w, r.Body)
+		_, _ = io.Copy(w, io.LimitReader(r.Body, 10*1024*1024))
 	}
 }
 

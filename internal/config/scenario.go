@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -156,12 +157,16 @@ func (s *Scenario) Validate() error {
 	if len(s.Spec.Gateways) == 0 {
 		return fmt.Errorf("at least one gateway is required")
 	}
+	promSelectorPattern := regexp.MustCompile(`^[a-zA-Z_][a-zA-Z0-9_./-]*(=~|!=|!~|=)"[^"]*"(\s*,\s*[a-zA-Z_][a-zA-Z0-9_./-]*(=~|!=|!~|=)"[^"]*")*$`)
 	for i, gw := range s.Spec.Gateways {
 		if gw.Name == "" {
 			return fmt.Errorf("gateways[%d].name is required", i)
 		}
 		if gw.URL == "" {
 			return fmt.Errorf("gateways[%d].url is required", i)
+		}
+		if gw.PromPodSelector != "" && !promSelectorPattern.MatchString(gw.PromPodSelector) {
+			return fmt.Errorf("gateways[%d].promPodSelector contains invalid characters", i)
 		}
 	}
 

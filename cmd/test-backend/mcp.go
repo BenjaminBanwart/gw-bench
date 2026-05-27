@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 
 	"crypto/rand"
-	mrand "math/rand"
 )
 
 // MCP JSON-RPC types
@@ -61,16 +59,14 @@ type mcpContent struct {
 	Text string `json:"text"`
 }
 
-var (
-	sessions   = make(map[string]bool)
-	sessionsMu sync.Mutex
-)
-
 func handleMCP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
+	// Limit request body to 1MB to prevent OOM from oversized payloads.
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
 	var req jsonRPCRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -100,10 +96,6 @@ func handleInitialize(w http.ResponseWriter, req jsonRPCRequest) {
 	b := make([]byte, 16)
 	_, _ = rand.Read(b)
 	sessionID := fmt.Sprintf("%x", b)
-
-	sessionsMu.Lock()
-	sessions[sessionID] = true
-	sessionsMu.Unlock()
 
 	result := mcpInitializeResult{
 		ProtocolVersion: "2025-03-26",
@@ -221,6 +213,3 @@ func writeJSONRPCError(w http.ResponseWriter, id json.RawMessage, code int, mess
 		Error:   &jsonRPCError{Code: code, Message: message},
 	})
 }
-
-// Suppress unused import warning — used in session ID generation
-var _ = mrand.Int
