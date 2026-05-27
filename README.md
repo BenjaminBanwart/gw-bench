@@ -185,7 +185,7 @@ The runner container (`Dockerfile.runner`) bundles everything needed to execute 
 |---|---|---|---|
 | `http-small-5k-qps` | HTTP | fortio | Small payload at 5k QPS, 100 connections |
 | `http-medium-payload` | HTTP | fortio | 100KB payload at 500 QPS, 50 connections |
-| `http-large-payload` | HTTP | fortio | 100MB payload at 10 QPS, 5 connections |
+| `http-large-payload` | HTTP | fortio | 70MB payload at 10 QPS, 5 connections |
 | `http-sustained-1k-qps` | HTTP | fortio | 5-minute sustained 1k QPS |
 | `many-routes` | HTTP | k6 | Fan-out across 500 routes, 100 VUs |
 | `tls-connection-churn` | HTTP/TLS | fortio | No keepalive — new TLS handshake per request |

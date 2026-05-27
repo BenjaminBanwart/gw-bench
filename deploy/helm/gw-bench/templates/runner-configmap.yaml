@@ -39,7 +39,7 @@ data:
     metadata:
       name: http-large-payload
       description: |
-        Large 100MB payload at moderate QPS. Tests throughput and buffering
+        Large 70MB payload at moderate QPS. Tests throughput and buffering
         behavior under high bandwidth conditions.
     spec:
       protocol: http
@@ -51,15 +51,15 @@ data:
       connections: 50
       payload:
         method: GET
-        path: /echo?size=104857600
-        sizeBytes: 104857600
+        path: /echo?size=73400320
+        sizeBytes: 73400320
         headers:
           X-Test-Run: gw-bench
       gateways:
         {{- range $name, $gw := .Values.gateways }}
         {{- if $gw.enabled }}
         - name: {{ $name }}
-          url: {{ $gw.scheme | default "https" }}://{{ $gw.hostname }}/echo?size=104857600
+          url: {{ $gw.scheme | default "https" }}://{{ $gw.hostname }}/echo?size=73400320
           {{- if $gw.promPodSelector }}
           promPodSelector: {{ $gw.promPodSelector | quote }}
           {{- end }}

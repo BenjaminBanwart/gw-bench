@@ -60,7 +60,7 @@ The following scenarios ship in the `scenarios/` directory.
 |---|---|---|---|---|---|
 | `http-small-5k-qps` | 5,000 | 100 | 0 B | 60 s | Baseline latency test with no payload |
 | `http-medium-payload` | 500 | 50 | 100 KB | 60 s | Throughput and buffering at moderate bandwidth |
-| `http-large-payload` | 10 | 5 | 100 MB | 60 s | Throughput and buffering at high bandwidth |
+| `http-large-payload` | 10 | 5 | 70 MB | 60 s | Throughput and buffering at high bandwidth |
 | `http-sustained-1k-qps` | 1,000 | 50 | 0 B | 300 s | 5-minute steady-state stability test |
 | `tls-connection-churn` | 500 | 50 | 0 B | 60 s | `noKeepAlive: true` — new TCP+TLS handshake per request; measures TLS termination overhead |
 

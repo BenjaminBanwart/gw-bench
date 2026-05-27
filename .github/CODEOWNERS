@@ -1,0 +1,11 @@
+# Default owner for everything
+* @BenjaminBanwart
+
+# Workflows and CI — require explicit review
+.github/ @BenjaminBanwart
+
+# Helm chart
+deploy/helm/ @BenjaminBanwart
+
+# Dockerfiles
+Dockerfile.* @BenjaminBanwart
