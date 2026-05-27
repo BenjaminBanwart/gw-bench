@@ -161,3 +161,42 @@ func TestParseK6Output_InvalidJSON(t *testing.T) {
 		t.Fatal("expected error for invalid JSON")
 	}
 }
+
+func TestParseK6Output_MedFallback(t *testing.T) {
+	// k6 default summaryTrendStats only include "med", not "p(50)"
+	fixture := []byte(`{
+  "metrics": {
+    "http_req_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 3.1,
+        "min": 0.4,
+        "med": 2.8,
+        "max": 90.0,
+        "p(90)": 6.0,
+        "p(95)": 8.5
+      }
+    },
+    "http_reqs": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 50000,
+        "rate": 1000
+      }
+    }
+  }
+}`)
+
+	result, err := parseK6Output(fixture, time.Now(), time.Now())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	assertFloat(t, "P50Ms (med fallback)", result.P50Ms, 2.8)
+	assertFloat(t, "P95Ms", result.P95Ms, 8.5)
+	// p(99) and p(99.9) not present in default stats — should be zero
+	assertFloat(t, "P99Ms", result.P99Ms, 0)
+	assertFloat(t, "P999Ms", result.P999Ms, 0)
+}
