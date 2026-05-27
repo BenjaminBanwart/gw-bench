@@ -8,6 +8,7 @@ const SUMMARY_PATH = __ENV.K6_SUMMARY_PATH || '/tmp/k6-summary.json';
 export const options = {
   vus: parseInt(__ENV.VUS || '100'),
   duration: __ENV.DURATION || '60s',
+  summaryTrendStats: ['avg', 'min', 'med', 'max', 'p(50)', 'p(95)', 'p(99)', 'p(99.9)'],
   thresholds: {
     http_req_failed: ['rate<0.05'],
   },

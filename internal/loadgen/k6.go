@@ -94,6 +94,9 @@ func parseK6Output(data []byte, measureStart, measureEnd time.Time) (*Result, er
 	// Parse http_req_duration metrics
 	if dur, ok := summary.Metrics["http_req_duration"]; ok {
 		result.P50Ms = dur.Values["p(50)"]
+		if result.P50Ms == 0 {
+			result.P50Ms = dur.Values["med"] // k6 default key for median
+		}
 		result.P95Ms = dur.Values["p(95)"]
 		result.P99Ms = dur.Values["p(99)"]
 		result.P999Ms = dur.Values["p(99.9)"]
